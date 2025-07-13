@@ -1,44 +1,38 @@
 package com.anshTravels.busWeb.Service;
 
 import com.anshTravels.busWeb.Entity.Bus;
+import com.anshTravels.busWeb.Repository.BusRepo;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class BusService {
-    List<Bus> BusList = new ArrayList<>();
 
-    BusService(){
-        BusList.add(new Bus("MH12AB1234","Rajesh Patil","9876543210"));
-        BusList.add(new Bus("DL01CD5678","Anil Kumar","9123456789"));
-    }
-
+    @Autowired
+    private BusRepo busRepo;
     //add
-    public Bus addBus(Bus bus1){
-        BusList.add(bus1);
-        //db mein save krne ka logic
+    public Bus add(Bus bus1){
+        busRepo.save(bus1);
         return bus1;
     }
     //all
-    public List<Bus> allBus(){
-        //db mein save krne ka logic
-        return this.BusList;
+    public List<Bus> all(){
+        List<Bus> list = busRepo.findAll();
+        return list;
     }
     //get
-    public Bus get(String busNumber){
-        Bus bus1 = BusList.stream()
-                .filter(bus -> bus.getBusNumber().equals(busNumber))
-                .findFirst()
-                .get();
-
-        return bus1;
+    public Bus get(String busNumber) {
+        return busRepo.findById(busNumber)
+                .orElseThrow(() -> new RuntimeException("Bus not found with number: " + busNumber));
     }
-    //delete
+
     public void delete(String busNumber) {
-        List<Bus> list = this.BusList.stream()
-                        .filter(bus -> !bus.getBusNumber().equals(busNumber))
-                        .toList();
-
-        this.BusList = list;
+        if (!busRepo.existsById(busNumber)) {
+            throw new RuntimeException("Bus not found with number: " + busNumber);
+        }
+        busRepo.deleteById(busNumber);
     }
+
 }
