@@ -1,55 +1,53 @@
 package com.anshTravels.busWeb.Controllers;
 
-import com.anshTravels.busWeb.Entity.Bus;
+import com.anshTravels.busWeb.dto.BusDto;
+import com.anshTravels.busWeb.dto.PagedResponse;
 import com.anshTravels.busWeb.Exceptions.ResourceNotFoundException;
 import com.anshTravels.busWeb.Service.BusService;
+import com.anshTravels.busWeb.dto.BusDto;
+import com.anshTravels.busWeb.dto.PagedResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-
 @RestController
-@RequestMapping("/bus")
+@RequestMapping("/buses")
 public class BusControllers {
 
     @Autowired
     private BusService busService;
-    //all
-    @GetMapping("/all-buses")
-    public ResponseEntity<List<Bus>> allBuses(){
-        return new ResponseEntity<>(busService.all(), HttpStatus.OK);
+
+    // ✅ Get all buses with pagination and sorting
+    @GetMapping
+    public PagedResponse<BusDto> allBuses(
+            @RequestParam(value = "page", defaultValue = "0") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size,
+            @RequestParam(value = "sortBy", defaultValue = "busNumber") String sortBy,
+            @RequestParam(value = "sortDir", defaultValue = "asc") String sortDir
+    ) {
+        return busService.all(page, size, sortBy, sortDir);
     }
 
-    //    get
-    @GetMapping("/get-bus/{busNumber}")
-    public ResponseEntity<Bus> getBus(@PathVariable String busNumber){
-        Bus bus = busService.get(busNumber);
-        if (bus == null) {
-            throw new ResourceNotFoundException("Bus not found with number: " + busNumber);
-        }
-        return new ResponseEntity<>(bus, HttpStatus.OK);
+    // ✅ Get a single bus by number
+    @GetMapping("/{busNumber}")
+    public ResponseEntity<BusDto> getBus(@PathVariable String busNumber) {
+        BusDto busDTO = busService.get(busNumber);
+        return new ResponseEntity<>(busDTO, HttpStatus.OK);
     }
 
-     //    add
-     @PostMapping("/add-bus")
-     public ResponseEntity<Bus> addBus(@RequestBody Bus bus) {
-         Bus newBus = busService.add(bus);
-         return new ResponseEntity<>(newBus, HttpStatus.CREATED);
-     }
+    // ✅ Add a new bus
+    @PostMapping
+    public ResponseEntity<BusDto> addBus(@Valid @RequestBody BusDto busDTO) {
+        BusDto newBus = busService.add(busDTO);
+        return new ResponseEntity<>(newBus, HttpStatus.CREATED);
+    }
 
-     //    delete
-     @DeleteMapping("/delete-bus/{busNumber}")
-     public ResponseEntity<String> deleteBus(@PathVariable String busNumber) {
-         Bus bus = busService.get(busNumber);
-         if (bus == null) {
-             throw new ResourceNotFoundException("Bus not found with number: " + busNumber);
-         }
-         busService.delete(busNumber);
-         return new ResponseEntity<>("Bus with number " + busNumber + " deleted successfully", HttpStatus.OK);
-     }
+    // ✅ Delete a bus
+    @DeleteMapping("/{busNumber}")
+    public ResponseEntity<String> deleteBus(@PathVariable String busNumber) {
+        busService.delete(busNumber);
+        return new ResponseEntity<>("Bus with number " + busNumber + " deleted successfully", HttpStatus.OK);
+    }
 }
-

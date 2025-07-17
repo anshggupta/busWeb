@@ -1,16 +1,14 @@
 package com.anshTravels.busWeb.Entity;
 
 import com.anshTravels.busWeb.Annotaion.ValidBusNumber;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
-import org.springframework.core.type.filter.RegexPatternTypeFilter;
 
 @Entity
 public class Bus {
+
     @Id
     @NotEmpty(message = "Bus number must not be empty")
     @ValidBusNumber
@@ -23,17 +21,18 @@ public class Bus {
     @Pattern(regexp = "^[6-9]\\d{9}$", message = "Driver contact must be a valid 10-digit Indian mobile number")
     private String driverContact;
 
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    private BusImage busImage;
 
+    public Bus() {}
 
-    public Bus(){
-
-    }
-    public Bus(String busNumber, String driverName, String driverContact){
+    public Bus(String busNumber, String driverName, String driverContact) {
         this.busNumber = busNumber;
         this.driverName = driverName;
         this.driverContact = driverContact;
     }
 
+    // Getters and Setters
     public String getBusNumber() {
         return busNumber;
     }
@@ -56,5 +55,13 @@ public class Bus {
 
     public void setDriverName(String driverName) {
         this.driverName = driverName;
+    }
+
+    public BusImage getBusImage() {
+        return busImage;
+    }
+
+    public void setBusImage(BusImage busImage) {
+        this.busImage = busImage;
     }
 }
