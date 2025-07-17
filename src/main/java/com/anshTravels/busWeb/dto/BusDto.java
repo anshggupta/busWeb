@@ -9,7 +9,6 @@ public class BusDto {
 
     @NotEmpty(message = "Bus number is required!")
     @Size(min = 3, max = 20, message = "Invalid length of bus number.")
-    @Pattern(regexp = "^\\d+$", message = "Bus number must contain only digits.")
     @Id
     private String busNumber;
 
