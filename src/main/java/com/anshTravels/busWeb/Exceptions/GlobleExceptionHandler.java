@@ -8,6 +8,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -62,6 +63,21 @@ public class GlobleExceptionHandler {
         ResponseEntity<Map<String, String>> error = new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
         return error;
 
+
+    }
+
+    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException exception) {
+
+        String message = exception.getMessage().contains("Duplicate entry") ? "You are trying to provide fields that are already in database. " : exception.getMessage();
+
+        ErrorResponse response
+                = new ErrorResponse(message, "400", false);
+
+
+        ResponseEntity<ErrorResponse> responseResponseEntity = new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+
+        return responseResponseEntity;
 
     }
 

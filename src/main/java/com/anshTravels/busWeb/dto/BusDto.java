@@ -4,7 +4,15 @@ import jakarta.persistence.Id;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class BusDto {
 
     @NotEmpty(message = "Bus number is required!")
@@ -21,31 +29,7 @@ public class BusDto {
     private String driverContact;
 
 
-    // Getters and Setters
 
-    public String getBusNumber() {
-        return busNumber;
-    }
-
-    public void setBusNumber(String busNumber) {
-        this.busNumber = busNumber;
-    }
-
-    public String getDriverName() {
-        return driverName;
-    }
-
-    public void setDriverName(String driverName) {
-        this.driverName = driverName;
-    }
-
-    public String getDriverContact() {
-        return driverContact;
-    }
-
-    public void setDriverContact(String driverContact) {
-        this.driverContact = driverContact;
-    }
 
 }
 
