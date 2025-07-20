@@ -1,18 +1,20 @@
 package com.anshTravels.busWeb.Controllers;
 
-import com.anshTravels.busWeb.dto.BusDto;
-import com.anshTravels.busWeb.dto.PagedResponse;
-import com.anshTravels.busWeb.dto.BusImageResponse;
+import com.anshTravels.busWeb.Entity.BusImage;
+import com.anshTravels.busWeb.dto.*;
 import com.anshTravels.busWeb.Service.BusImageService;
 import com.anshTravels.busWeb.Service.BusService;
+import org.springframework.core.io.Resource; // ✅ CORRECT
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 
 @RestController
 @RequestMapping("/buses")
@@ -57,11 +59,35 @@ public class BusControllers {
     }
 
     // ✅ Upload image for a bus
-    @PostMapping("/upload/{busNumber}")
-    public BusImageResponse uploadBusImage(
+    @PostMapping("/{busNumber}/upload-image")
+    public ResponseEntity<?> uploadBusImage(
             @PathVariable String busNumber,
             @RequestParam("image") MultipartFile image
     ) throws IOException {
-        return busImageService.upload(image, busNumber);
+
+        String contentType = image.getContentType();
+        System.out.println(contentType);
+
+        if (contentType.toLowerCase().startsWith("image")) {
+            return new ResponseEntity<>(busImageService.upload(image, busNumber), HttpStatus.CREATED);
+        } else {
+            return new ResponseEntity<>(new ErrorResponse("Image not uploaded", "403", false), HttpStatus.BAD_REQUEST);
+        }
     }
+
+    // Serve/Fetch image from a bus
+    @GetMapping("/{busNumber}/image")
+    public ResponseEntity<Resource> serveBusImage(
+            @PathVariable("busNumber") String busNumber
+    ) throws MalformedURLException {
+
+        BusImageDataWithResource imageData = busImageService.loadImageByBusNo(busNumber);
+        BusImage busImage = imageData.busImage();
+
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(busImage.getFileType()))
+                .body(imageData.resource());
+    }
+
 }
+

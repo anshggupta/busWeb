@@ -1,5 +1,7 @@
 package com.anshTravels.busWeb.Service;
 
+import com.anshTravels.busWeb.Config.AppConstants;
+import com.anshTravels.busWeb.dto.BusImageDataWithResource;
 import com.anshTravels.busWeb.dto.BusImageResponse;
 import com.anshTravels.busWeb.Entity.Bus;
 import com.anshTravels.busWeb.Entity.BusImage;
@@ -8,11 +10,14 @@ import com.anshTravels.busWeb.Repository.BusImageRepository;
 import com.anshTravels.busWeb.Repository.BusRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
@@ -58,6 +63,31 @@ public class BusImageService {
         // Save bus with image
         Bus savedBus = busRepository.save(bus);
 
-        return BusImageResponse.from(savedBus.getBusImage(), "https://localhost:8080");
+        return BusImageResponse.from(savedBus.getBusImage(), AppConstants.BASE_URL, busNumber);
     }
+
+
+    public BusImageDataWithResource loadImageByBusNo(String busNumber) throws MalformedURLException {
+
+        // Get the bus using bus ID
+        Bus bus = busRepository.findById(busNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Bus not found!!"));
+
+        BusImage busImage = bus.getBusImage();
+        if (busImage == null) {
+            throw new ResourceNotFoundException("Image not found !!");
+        }
+
+        Path path = Paths.get(busImage.getFileName());
+
+        if (!Files.exists(path)) {
+            throw new ResourceNotFoundException("Image file not found on disk !!");
+        }
+
+        UrlResource urlResource = new UrlResource(path.toUri());
+
+        // Package image entity + resource together
+        return new BusImageDataWithResource(busImage, urlResource);
+    }
+
 }

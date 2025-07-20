@@ -5,8 +5,18 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Bus {
 
     @Id
@@ -24,44 +34,13 @@ public class Bus {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private BusImage busImage;
 
-    public Bus() {}
+    @OneToMany(mappedBy = "bus", cascade = CascadeType.ALL)
+    private List<BusRoute> busRoute;
 
-    public Bus(String busNumber, String driverName, String driverContact) {
-        this.busNumber = busNumber;
-        this.driverName = driverName;
-        this.driverContact = driverContact;
-    }
+    @OneToMany(mappedBy = "bus", cascade = CascadeType.ALL)
+    private List<BusSchedule> busSchedule;
+
 
     // Getters and Setters
-    public String getBusNumber() {
-        return busNumber;
-    }
 
-    public void setBusNumber(String busNumber) {
-        this.busNumber = busNumber;
-    }
-
-    public String getDriverContact() {
-        return driverContact;
-    }
-
-    public void setDriverContact(String driverContact) {
-        this.driverContact = driverContact;
-    }
-
-    public String getDriverName() {
-        return driverName;
-    }
-
-    public void setDriverName(String driverName) {
-        this.driverName = driverName;
-    }
-
-    public BusImage getBusImage() {
-        return busImage;
-    }
-
-    public void setBusImage(BusImage busImage) {
-        this.busImage = busImage;
-    }
 }

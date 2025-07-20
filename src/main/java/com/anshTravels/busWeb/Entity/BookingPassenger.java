@@ -1,0 +1,36 @@
+package com.anshTravels.busWeb.Entity;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Table(name = "booking_passengers")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class BookingPassenger {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    // Reference to the BusBooking
+    @ManyToOne
+    @JoinColumn(name = "booking_id")
+    private Booking booking;
+
+    private String name;
+
+    private Integer age;
+
+    private String gender;
+
+    private String seatNumber;
+
+    // Getters and setters
+    // ...
+}
